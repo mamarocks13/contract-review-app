@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redline &mdash; Contract Review</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,600;0,700;1,600&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+          </svg>
+        </span>
+        <span class="brand-name">Redline</span>
+      </div>
+      <div class="doc-crumb">
+        <span id="doc-name" class="doc-name">No contract loaded</span>
+        <span id="doc-meta" class="doc-meta">Upload a PDF to get started</span>
+      </div>
+      <div class="topbar-actions">
+        <button type="button" class="topbar-btn" id="feedback-btn" aria-haspopup="dialog" aria-controls="feedback-dialog">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Feedback</span>
+        </button>
+        <div class="user-chip">MK</div>
+      </div>
+    </header>
+
+    <main class="workspace">
+
+      <section class="pane contract-pane">
+        <div class="pane-header">
+          <div class="pane-heading">
+            <h2>Contract</h2>
+            <p id="contract-status">No file uploaded yet</p>
+          </div>
+          <div class="pane-tools" id="contract-tools" hidden>
+            <button type="button" class="icon-btn" id="replace-file-btn" aria-label="Replace file">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            </button>
+            <button type="button" class="icon-btn" id="remove-file-btn" aria-label="Remove file">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="pane-body">
+          <div id="drop-zone" class="drop-zone" role="group" aria-label="Upload a PDF contract">
+            <input type="file" id="file-input" accept="application/pdf" hidden>
+            <div class="drop-zone-content">
+              <span class="drop-zone-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 14.9A5 5 0 0 1 6 5.3 6.5 6.5 0 0 1 18.7 8H19a4 4 0 0 1 1 7.9"/><path d="M12 12v9"/><path d="m9 15 3-3 3 3"/></svg>
+              </span>
+              <p class="drop-zone-title">Drag &amp; drop a PDF here</p>
+              <p class="drop-zone-sub">or</p>
+              <button id="browse-btn" type="button" class="btn btn-primary">Browse files</button>
+            </div>
+          </div>
+
+          <div id="pdf-viewer" class="pdf-viewer" hidden>
+            <embed id="pdf-embed" type="application/pdf" width="100%" height="100%" title="Contract PDF preview">
+          </div>
+        </div>
+      </section>
+
+      <aside class="pane chat-pane">
+        <div class="pane-header">
+          <div class="pane-heading">
+            <h2>Ask Redline</h2>
+            <p>Ask a question about the contract</p>
+          </div>
+          <button type="button" class="btn btn-sm" id="download-responses-btn" hidden>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Download Responses</span>
+          </button>
+        </div>
+
+        <div class="quick-actions" id="quick-actions" hidden>
+          <button type="button" class="chip" data-question="Summarize the key risks in this contract.">Summarize key risks</button>
+          <button type="button" class="chip" data-question="What are the termination terms?">Explain termination terms</button>
+          <button type="button" class="chip" data-question="What's the liability cap?">What's the liability cap?</button>
+        </div>
+
+        <div id="chat-messages" class="message-stream" role="log" aria-live="polite" aria-label="Conversation">
+          <div class="msg">
+            <span class="msg-avatar">AI</span>
+            <div class="bubble">Upload a contract, then ask me a question about it.</div>
+          </div>
+        </div>
+
+        <form id="chat-form" class="composer">
+          <input
+            type="text"
+            id="chat-input"
+            class="composer-field"
+            aria-label="Ask a question about this contract"
+            placeholder="Ask a question about this contract..."
+            autocomplete="off"
+          >
+          <button type="submit" class="send-btn" aria-label="Send message">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </form>
+      </aside>
+
+    </main>
+
+  </div>
+
+  <dialog id="feedback-dialog" class="modal" aria-labelledby="feedback-title" aria-describedby="feedback-desc">
+    <div class="modal-panel">
+      <div class="pane-header">
+        <div class="pane-heading">
+          <h2 id="feedback-title">Send feedback</h2>
+          <p id="feedback-desc">Tell us how Redline is working for you.</p>
+        </div>
+        <button type="button" class="icon-btn" id="feedback-close-btn" aria-label="Close feedback form">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <form id="feedback-form" class="modal-form" novalidate>
+        <div class="modal-body">
+        <fieldset id="feedback-fields" class="form-fields">
+          <fieldset class="field rating-field" id="fb-rating-group" aria-describedby="fb-rating-hint fb-rating-error">
+            <legend class="field-label">Rating <span class="field-req" aria-hidden="true">*</span><span class="sr-only">(required)</span></legend>
+            <div class="rating">
+              <label class="rating-option"><input type="radio" name="rating" value="1"><span>1</span></label>
+              <label class="rating-option"><input type="radio" name="rating" value="2"><span>2</span></label>
+              <label class="rating-option"><input type="radio" name="rating" value="3"><span>3</span></label>
+              <label class="rating-option"><input type="radio" name="rating" value="4"><span>4</span></label>
+              <label class="rating-option"><input type="radio" name="rating" value="5"><span>5</span></label>
+            </div>
+            <p class="field-hint" id="fb-rating-hint">1 = poor, 5 = excellent</p>
+            <p class="field-error" id="fb-rating-error" hidden></p>
+          </fieldset>
+
+          <div class="field">
+            <label class="field-label" for="fb-comment">Feedback <span class="field-req" aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+            <textarea id="fb-comment" name="comment" class="form-control" rows="4" maxlength="2000" aria-describedby="fb-comment-error" placeholder="What worked well? What could be better?"></textarea>
+            <p class="field-error" id="fb-comment-error" hidden></p>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="fb-name">Name <span class="field-optional">(optional)</span></label>
+              <input type="text" id="fb-name" name="name" class="form-control" autocomplete="name" maxlength="120">
+            </div>
+            <div class="field">
+              <label class="field-label" for="fb-email">Email <span class="field-optional">(optional)</span></label>
+              <input type="email" id="fb-email" name="email" class="form-control" autocomplete="email" maxlength="254" aria-describedby="fb-email-error">
+              <p class="field-error" id="fb-email-error" hidden></p>
+            </div>
+          </div>
+        </fieldset>
+        </div>
+
+        <div class="form-alert" id="feedback-alert" role="alert" hidden></div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn" id="feedback-cancel-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="feedback-submit-btn">
+            <span class="btn-spinner" aria-hidden="true"></span>
+            <span class="btn-label">Submit feedback</span>
+          </button>
+        </div>
+      </form>
+
+      <div class="modal-success" id="feedback-success" hidden>
+        <span class="success-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        <h3 id="feedback-success-title" tabindex="-1">Thanks for your feedback</h3>
+        <p>We read every response and use it to improve Redline.</p>
+        <button type="button" class="btn btn-primary" id="feedback-done-btn">Done</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
