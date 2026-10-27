@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redline</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,600;0,700;1,600&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root {
+    --bg: #f4f5f8;
+    --surface: #ffffff;
+    --surface-2: #fbfbfd;
+    --navy-900: #0e1b32;
+    --navy-700: #1b3358;
+    --ink: #16202e;
+    --muted: #5b6b82;
+    --border: #e1e4ea;
+    --accent: #c2410c;
+    --on-accent: #ffffff;
+    --accent-ink: #8a3a0c;
+    --accent-soft: rgba(221, 91, 18, 0.12);
+    --accent-soft-2: rgba(221, 91, 18, 0.28);
+    --shadow: 0 1px 2px rgba(14, 27, 50, 0.04), 0 8px 24px rgba(14, 27, 50, 0.06);
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0a1120;
+      --surface: #101b30;
+      --surface-2: #0d1526;
+      --navy-900: #060c18;
+      --navy-700: #24406b;
+      --ink: #e7ebf3;
+      --muted: #90a0b7;
+      --border: #223252;
+      --accent: #f0813a;
+      --on-accent: #0e1b32;
+      --accent-ink: #ffd9b8;
+      --accent-soft: rgba(240, 129, 58, 0.16);
+      --accent-soft-2: rgba(240, 129, 58, 0.34);
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 28px rgba(0, 0, 0, 0.35);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0a1120;
+    --surface: #101b30;
+    --surface-2: #0d1526;
+    --navy-900: #060c18;
+    --navy-700: #24406b;
+    --ink: #e7ebf3;
+    --muted: #90a0b7;
+    --border: #223252;
+    --accent: #f0813a;
+    --on-accent: #0e1b32;
+    --accent-ink: #ffd9b8;
+    --accent-soft: rgba(240, 129, 58, 0.16);
+    --accent-soft-2: rgba(240, 129, 58, 0.34);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 28px rgba(0, 0, 0, 0.35);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+  }
+
+  a { color: var(--accent-ink); }
+  a:hover { color: var(--accent); }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+  }
+  button:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .app-shell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* ---- Topbar ---- */
+
+  .topbar {
+    flex-shrink: 0;
+    background: var(--navy-900);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 14px clamp(16px, 3vw, 32px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .brand-mark {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--on-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .brand-name {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 20px;
+    color: #ffffff;
+    letter-spacing: 0.01em;
+  }
+
+  .doc-crumb {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+    flex: 1;
+    align-items: center;
+    text-align: center;
+  }
+
+  .doc-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+    font-family: "IBM Plex Mono", "Public Sans", monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .doc-meta {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .user-chip {
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ---- Workspace ---- */
+
+  .workspace {
+    flex: 1;
+    display: flex;
+    gap: 20px;
+    padding: 20px clamp(16px, 3vw, 32px) clamp(20px, 3vh, 32px);
+    min-height: 0;
+    align-items: stretch;
+  }
+
+  .pane {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    box-shadow: var(--shadow);
+  }
+
+  .contract-pane {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .chat-pane {
+    width: 380px;
+    flex-shrink: 0;
+  }
+
+  .pane-header {
+    flex-shrink: 0;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .pane-heading h2 {
+    margin: 0 0 2px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .pane-heading p {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+
+  .pane-tools {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .icon-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .icon-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .tool-divider {
+    width: 1px;
+    height: 18px;
+    background: var(--border);
+    margin: 0 2px;
+  }
+
+  .zoom-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    color: var(--muted);
+    width: 34px;
+    text-align: center;
+  }
+
+  /* ---- Document ---- */
+
+  .document-scroll {
+    flex: 1;
+    background: var(--surface-2);
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    min-height: 0;
+  }
+
+  .document-page {
+    width: min(100%, 560px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 36px clamp(24px, 4vw, 44px);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    height: fit-content;
+  }
+
+  .clause {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .clause-number {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  .clause h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .clause p {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--ink);
+    max-width: 65ch;
+  }
+
+  .clause.flagged {
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-soft-2);
+    border-radius: 8px;
+    padding: 16px 18px;
+    gap: 8px;
+  }
+
+  .flag-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+
+  .flag-row svg { stroke: var(--accent); flex-shrink: 0; }
+
+  .flag-row span {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--accent-ink);
+  }
+
+  .flag-note {
+    margin-top: 4px;
+    font-size: 12.5px;
+    font-style: italic;
+    color: var(--accent-ink);
+  }
+
+  .pane-footer {
+    flex-shrink: 0;
+    height: 44px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+
+  .pane-footer span {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- Chat ---- */
+
+  .quick-actions {
+    flex-shrink: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .chip {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .chip:hover {
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .message-stream {
+    flex: 1;
+    background: var(--surface-2);
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow-y: auto;
+    min-height: 0;
+  }
+
+  .msg {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .msg.user {
+    justify-content: flex-end;
+  }
+
+  .msg-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 999px;
+    background: var(--navy-700);
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .bubble {
+    max-width: 82%;
+    padding: 10px 13px;
+    border-radius: 12px 12px 12px 3px;
+    font-size: 13px;
+    line-height: 1.55;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .msg.user .bubble {
+    background: var(--navy-700);
+    border-color: var(--navy-700);
+    color: #ffffff;
+    border-radius: 12px 12px 3px 12px;
+  }
+
+  .bubble .risk-tag {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    border-radius: 999px;
+    padding: 3px 9px;
+    font-size: 10.5px;
+    font-weight: 700;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .composer {
+    flex-shrink: 0;
+    padding: 14px 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .composer-field {
+    flex: 1;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 10px 15px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--muted);
+    min-width: 0;
+  }
+
+  .composer-field::placeholder { color: var(--muted); }
+
+  .send-btn {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    border: none;
+    background: var(--accent);
+    color: var(--on-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .send-btn:hover { filter: brightness(1.06); }
+  .send-btn svg { stroke: currentColor; }
+
+  /* ---- Responsive ---- */
+
+  @media (max-width: 860px) {
+    .workspace {
+      flex-direction: column;
+    }
+    .chat-pane {
+      width: 100%;
+    }
+    .contract-pane {
+      min-height: 420px;
+      flex: 0 0 auto;
+    }
+    .chat-pane {
+      flex: 0 0 auto;
+      min-height: 460px;
+    }
+    .doc-crumb {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <path d="M12 20h9"/>
+          <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+        </svg>
+      </span>
+      <span class="brand-name">Redline</span>
+    </div>
+    <div class="doc-crumb">
+      <span class="doc-name">MSA_Meridian_Renewal_v3.pdf</span>
+      <span class="doc-meta">Round 3 &middot; vendor redline received today</span>
+    </div>
+    <div class="user-chip">MK</div>
+  </header>
+
+  <main class="workspace">
+
+    <section class="pane contract-pane">
+      <div class="pane-header">
+        <div class="pane-heading">
+          <h2>Master Services Agreement</h2>
+          <p>Meridian Systems &middot; 14 pages &middot; round 3 redline</p>
+        </div>
+        <div class="pane-tools">
+          <button type="button" class="icon-btn" aria-label="Zoom out">&minus;</button>
+          <span class="zoom-label">100%</span>
+          <button type="button" class="icon-btn" aria-label="Zoom in">+</button>
+          <span class="tool-divider"></span>
+          <button type="button" class="icon-btn" aria-label="Download">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="document-scroll">
+        <article class="document-page">
+          <div class="clause">
+            <span class="clause-number">7.2</span>
+            <h3>Termination for Convenience</h3>
+            <p>Either party may terminate this Agreement upon thirty (30) days&rsquo; prior written notice to the other party, without cause and without penalty, provided all outstanding fees are settled through the effective termination date.</p>
+          </div>
+
+          <div class="clause">
+            <span class="clause-number">9.1</span>
+            <h3>Limitation of Liability</h3>
+            <p>Except for breaches of Section 11 (Confidentiality), neither party&rsquo;s aggregate liability under this Agreement shall exceed the fees paid or payable in the twelve (12) months preceding the claim.</p>
+          </div>
+
+          <div class="clause flagged">
+            <div class="flag-row">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+              <span>Flagged &middot; Medium risk</span>
+            </div>
+            <span class="clause-number">12.3</span>
+            <h3>Indemnification</h3>
+            <p>Vendor shall indemnify, defend, and hold harmless Client from any and all claims, losses, and damages arising from Vendor&rsquo;s performance, negligence, or willful misconduct, including third-party intellectual-property claims not disclosed in Exhibit C.</p>
+            <p class="flag-note">Broader than your standard playbook language &mdash; recommend narrowing to direct damages and disclosed claims only.</p>
+          </div>
+
+          <div class="clause">
+            <span class="clause-number">14.5</span>
+            <h3>Governing Law</h3>
+            <p>This Agreement shall be governed by the laws of the State of Delaware, without regard to its conflict-of-law principles.</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="pane-footer">
+        <button type="button" class="icon-btn" aria-label="Previous page" style="width:24px;height:24px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <span>Page 6 of 14</span>
+        <button type="button" class="icon-btn" aria-label="Next page" style="width:24px;height:24px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <aside class="pane chat-pane">
+      <div class="pane-header">
+        <div class="pane-heading">
+          <h2>Ask Redline</h2>
+          <p>Grounded in this document&rsquo;s clauses</p>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <button type="button" class="chip">Summarize key risks</button>
+        <button type="button" class="chip">Compare to playbook</button>
+        <button type="button" class="chip">Explain Section 9.1</button>
+      </div>
+
+      <div class="message-stream">
+        <div class="msg">
+          <span class="msg-avatar">AI</span>
+          <div class="bubble">
+            <span>Section 9.1 caps liability at fees paid in the trailing 12 months, except for confidentiality breaches under Section 11 &mdash; that&rsquo;s a standard mutual cap.</span>
+          </div>
+        </div>
+
+        <div class="msg user">
+          <div class="bubble">What about the indemnification clause &mdash; anything unusual?</div>
+        </div>
+
+        <div class="msg">
+          <span class="msg-avatar">AI</span>
+          <div class="bubble">
+            <span>Section 12.3 extends indemnification to undisclosed third-party IP claims, which is broader than your standard playbook language.</span>
+            <span class="risk-tag">MEDIUM RISK &middot; SEC. 12.3</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="composer">
+        <input type="text" class="composer-field" aria-label="Ask a question about this contract" placeholder="Ask a question about this contract&hellip;" disabled>
+        <button type="button" class="send-btn" aria-label="Send message">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </aside>
+
+  </main>
+
+</div>
+
+</body>
+</html>
